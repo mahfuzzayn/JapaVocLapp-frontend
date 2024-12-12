@@ -57,15 +57,15 @@ const Lessons = () => {
                         </h2>
                         <p className="text-lg text-gray-600">
                             Lesson Number:
-                            <div className="badge badge-warning ml-1">
+                            <span className="badge badge-warning ml-1">
                                 {lesson.lessonNumber}
-                            </div>
+                            </span>
                         </p>
                         <p className="text-lg text-gray-600">
                             Vocabulary Count:
-                            <div className="badge badge-info ml-1">
+                            <span className="badge badge-info ml-1">
                                 {lesson.vocabularyCount}
-                            </div>
+                            </span>
                         </p>
                         <button
                             onClick={() =>

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Confetti from "react-confetti";
 
 const Lesson = () => {
     const { lessonNumber } = useParams();
+    const navigate = useNavigate();
     const [lesson, setLesson] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [showConfetti, setShowConfetti] = useState(false);
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -16,34 +18,69 @@ const Lesson = () => {
                 );
                 setLesson(response.data.data);
             } catch (err) {
-                setError("Failed to fetch lesson. Please try again later.");
-            } finally {
-                setLoading(false);
+                console.error("Failed to fetch lesson:", err);
             }
         };
 
         fetchLesson();
     }, [lessonNumber]);
 
-    if (loading) {
-        return (
-            <div className="lesson flex justify-center">
-                <span className="loading loading-spinner loading-lg"></span>
-            </div>
-        );
-    }
+    if (!lesson) return <div>Loading lesson...</div>;
 
-    if (error) {
-        return <div className="text-red-500">{error}</div>;
-    }
+    const { vocabularies } = lesson;
+    const currentVocabulary = vocabularies[currentIndex];
+
+    const handleNext = () => {
+        if (currentIndex < vocabularies.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+        } else {
+            setShowConfetti(true);
+            setTimeout(() => {
+                navigate("/lessons");
+            }, 5000);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentIndex > 0) {
+            setCurrentIndex(currentIndex - 1);
+        }
+    };
+
+    const playPronunciation = () => {
+        const audio = new Audio(currentVocabulary.pronunciation);
+        audio.play();
+    };
 
     return (
-        <div className="lesson p-8">
-            <h1 className="text-3xl font-bold mb-6 text-cyan-500">
-                {lesson?.name}
-            </h1>
-            <p>Lesson Number: {lesson?.lessonNumber}</p>
-            <p>Vocabulary Count: {lesson?.vocabularyCount}</p>
+        <div className="p-8">
+            {showConfetti && <Confetti />}
+            <h1 className="text-3xl font-bold mb-4">{lesson.name}</h1>
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2
+                    className="text-2xl font-semibold cursor-pointer text-blue-500"
+                    onClick={playPronunciation}
+                >
+                    {currentVocabulary.word}
+                </h2>
+                <p>Pronunciation: {currentVocabulary.pronunciation}</p>
+                <p>Meaning: {currentVocabulary.meaning}</p>
+                <p>When to Say: {currentVocabulary.whenToSay}</p>
+            </div>
+            <div className="mt-6 flex justify-between">
+                <button
+                    onClick={handlePrevious}
+                    disabled={currentIndex === 0}
+                    className="btn btn-secondary"
+                >
+                    Previous
+                </button>
+                <button onClick={handleNext} className="btn btn-primary">
+                    {currentIndex < vocabularies.length - 1
+                        ? "Next"
+                        : "Complete"}
+                </button>
+            </div>
         </div>
     );
 };

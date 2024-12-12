@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../components/Lesson/context/UserContext";
 import axios from "axios";
 
 const Register = () => {
