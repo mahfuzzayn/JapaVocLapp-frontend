@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import Confetti from "react-confetti";
+import Vocabulary from "./Vocabulary/Vocabulary";
 
 const Lesson = () => {
     const { lessonNumber } = useParams();
@@ -25,7 +26,27 @@ const Lesson = () => {
         fetchLesson();
     }, [lessonNumber]);
 
-    if (!lesson) return <div>Loading lesson...</div>;
+    if (!lesson)
+        return (
+            <div className="home flex flex-col items-center my-5">
+                <h2 className="text-2xl font-semibold">
+                    Loading Lesson with Vocabularies
+                </h2>
+                <span className="loading loading-dots loading-lg"></span>
+            </div>
+        );
+
+    if (!lesson.vocabularyCount)
+        return (
+            <div className="home flex flex-col items-center my-5">
+                <h2 className="text-2xl font-semibold">
+                    There is no vocabulary in this lesson
+                </h2>
+                <button className="btn btn-primary text-white text-xl mt-4">
+                    <Link to="/lessons">Go to Lessons</Link>
+                </button>
+            </div>
+        );
 
     const { vocabularies } = lesson;
     const currentVocabulary = vocabularies[currentIndex];
@@ -47,26 +68,11 @@ const Lesson = () => {
         }
     };
 
-    const playPronunciation = () => {
-        const audio = new Audio(currentVocabulary.pronunciation);
-        audio.play();
-    };
-
     return (
         <div className="p-8">
             {showConfetti && <Confetti />}
             <h1 className="text-3xl font-bold mb-4">{lesson.name}</h1>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2
-                    className="text-2xl font-semibold cursor-pointer text-blue-500"
-                    onClick={playPronunciation}
-                >
-                    {currentVocabulary.word}
-                </h2>
-                <p>Pronunciation: {currentVocabulary.pronunciation}</p>
-                <p>Meaning: {currentVocabulary.meaning}</p>
-                <p>When to Say: {currentVocabulary.whenToSay}</p>
-            </div>
+            <Vocabulary vocabulary={currentVocabulary} />
             <div className="mt-6 flex justify-between">
                 <button
                     onClick={handlePrevious}
