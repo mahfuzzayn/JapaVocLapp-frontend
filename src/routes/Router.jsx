@@ -4,7 +4,7 @@ import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import Lessons from "../pages/Lessons/Lessons";
-import Lesson from "../components/Lesson";
+import Lesson from "../components/Lesson/Lesson";
 
 const router = createBrowserRouter([
     {

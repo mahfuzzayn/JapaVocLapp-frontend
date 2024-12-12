@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useUser } from "../../components/Lesson/context/UserContext";
+import { useUser } from "../../context/UserContext";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -17,7 +17,11 @@ const Login = () => {
                 "http://localhost:5000/api/v1/users/login",
                 { email, password }
             );
-            const userData = { email, token: response.data.data.token };
+            const userData = {
+                name: response.data.data.name,
+                email: response.data.data.email,
+                token: response.data.data.token,
+            };
 
             login(userData);
 

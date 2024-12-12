@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import Confetti from "react-confetti";
-import Vocabulary from "./Vocabulary/Vocabulary";
+import Vocabulary from "../Vocabulary/Vocabulary";
 
 const Lesson = () => {
     const { lessonNumber } = useParams();
