@@ -1,36 +1,46 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
 import axios from "axios";
-import { useUser } from "../../context/UserContext"; // Import useUser
 
 const Register = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
-    const { login } = useUser(); // Get login function from context
+    const { login } = useUser();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:5000/api/v1/users/register", {
-                name,
-                email,
-                password,
-            });
+            const response = await axios.post(
+                "http://localhost:5000/api/v1/users/register",
+                {
+                    name,
+                    email,
+                    password,
+                }
+            );
 
             const loginResponse = await axios.post(
                 "http://localhost:5000/api/v1/users/login",
-                { email, password }
+                {
+                    name,
+                    password,
+                }
             );
-            const userData = { email, token: loginResponse.data.data.token };
 
-            login(userData);
+            const { token, user } = loginResponse.data.data;
 
-            navigate("/");
+            localStorage.setItem("token", token);
+            login(user);
+
+            const from = location.state?.from || "/";
+            navigate(from);
         } catch (err) {
-            setError("Error creating account.");
+            setError("Error registering or logging in user. Please try again.");
         }
     };
 
@@ -42,8 +52,8 @@ const Register = () => {
                     <div className="mb-4">
                         <input
                             type="text"
-                            placeholder="Full Name"
-                            className="input text-white input-bordered w-full"
+                            placeholder="Name"
+                            className="input input-bordered w-full"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
@@ -53,7 +63,7 @@ const Register = () => {
                         <input
                             type="email"
                             placeholder="Email"
-                            className="input text-white input-bordered w-full"
+                            className="input input-bordered w-full"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -63,7 +73,7 @@ const Register = () => {
                         <input
                             type="password"
                             placeholder="Password"
-                            className="input text-white input-bordered w-full"
+                            className="input input-bordered w-full"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required

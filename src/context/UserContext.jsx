@@ -1,25 +1,38 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UserContext = createContext();
+
+export const useUser = () => useContext(UserContext);
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (storedUser) {
-            setUser(storedUser);
+        const token = localStorage.getItem("token");
+        if (token) {
+            axios
+                .get("http://localhost:5000/api/verify-token", {
+                    headers: { Authorization: `Bearer ${token}` },
+                })
+                .then((res) => {
+                    setUser({ token });
+                })
+                .catch(() => {
+                    localStorage.removeItem("token");
+                });
         }
     }, []);
 
     const login = (userData) => {
         setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem("token", userData.token);
     };
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem("user");
+        localStorage.removeItem("token");
     };
 
     return (
@@ -28,5 +41,3 @@ export const UserProvider = ({ children }) => {
         </UserContext.Provider>
     );
 };
-
-export const useUser = () => useContext(UserContext);
